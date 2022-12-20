@@ -1,0 +1,15 @@
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\bin\Debug\net6.0\ServidorHttpSimples.exe
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\bin\Debug\net6.0\ServidorHttpSimples.deps.json
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\bin\Debug\net6.0\ServidorHttpSimples.runtimeconfig.json
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\bin\Debug\net6.0\ServidorHttpSimples.dll
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\bin\Debug\net6.0\ServidorHttpSimples.pdb
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.csproj.AssemblyReference.cache
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.AssemblyInfoInputs.cache
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.AssemblyInfo.cs
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.csproj.CoreCompileInputs.cache
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.dll
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\refint\ServidorHttpSimples.dll
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.pdb
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ServidorHttpSimples.genruntimeconfig.cache
+C:\Users\rafae\Documents\Github\DotNetProjects\ServidorHttpSimples\obj\Debug\net6.0\ref\ServidorHttpSimples.dll
