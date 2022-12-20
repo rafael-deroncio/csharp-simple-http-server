@@ -100,10 +100,9 @@ class ServidorHttp : IServerHttp
     private byte[] ReadFile(string resource)
     {
         string directory = "C:\\Users\rafae\\Documents\\Github\\DotNetProjects\\ServidorHttpSimples\\www";
-        string filePath = $"{directory}\\{resource.Replace("/", "")}";
+        string filePath = directory + resource.Replace("/", "\\");
 
         if (File.Exists(filePath))
-            Console.WriteLine(filePath);
             return File.ReadAllBytes(filePath);
         
         return new byte[0];
