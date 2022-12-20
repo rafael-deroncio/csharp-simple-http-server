@@ -58,7 +58,7 @@ class ServidorHttp : IServerHttp
             {
                 Console.WriteLine($"\n{textRequest}\n");
 
-                byte[] bytesContext = Encoding.UTF8.GetBytes(this.Html, 0, this.Html.Length);
+                byte[] bytesContext = ReadFile("/index.html");
                 byte[] bytesHeader = GenerateHeader("HTTP/1.1", "text/html;charset=utf-8", "200", bytesContext.Length);
 
                 int bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
@@ -95,5 +95,17 @@ class ServidorHttp : IServerHttp
         html.Append("<h1>Index</h1></body><html>");
 
         this.Html = html.ToString();
+    }
+
+    private byte[] ReadFile(string resource)
+    {
+        string directory = "C:\\Users\rafae\\Documents\\Github\\DotNetProjects\\ServidorHttpSimples\\www";
+        string filePath = $"{directory}\\{resource.Replace("/", "")}";
+
+        if (File.Exists(filePath))
+            Console.WriteLine(filePath);
+            return File.ReadAllBytes(filePath);
+        
+        return new byte[0];
     }
 }
