@@ -8,15 +8,16 @@ class ServidorHttp : IServerHttp
     private int Port { get; set; }
     private int QtdRequests { get; set; }
     private string Html { get; set; }
+    private string IP { get; set; }
 
-    public ServidorHttp(int port = 8080)
+    public ServidorHttp(string ipAddress = "127.0.0.1", int port = 8080)
     {
+        this.IP = ipAddress;
         this.Port = port;
-        this.GenerateHtml();
 
         try
         {
-            this.Controller = new TcpListener(IPAddress.Parse("127.0.0.1"), this.Port);
+            this.Controller = new TcpListener(IPAddress.Parse(this.IP), this.Port);
             this.Controller.Start();
 
             Console.WriteLine($"Server HTTp runing in port: {this.Port}.");
@@ -27,7 +28,6 @@ class ServidorHttp : IServerHttp
         }
         catch (Exception e)
         {
-            
             Console.WriteLine($"Error starting server in port {this.Port}:\n{e.Message}");
         }
     }
@@ -49,39 +49,53 @@ class ServidorHttp : IServerHttp
 
         if (socket.Connected)
         {
+            int bytesSending = 0;
+            byte[] bytesContext = null;
+            byte[] bytesHeader = null;    
             byte[] bytesRequest = new byte[1024];
+            
             socket.Receive(bytesRequest, bytesRequest.Length, 0);
 
-            string textRequest = Encoding.UTF8.GetString(bytesRequest).Replace((char)0, ' ').Trim();
+            Console.WriteLine($"{Encoding.UTF8.GetString(bytesRequest)}\n");
 
-            if (textRequest.Length > 0)
+            HandledRequest request = new HandledRequest(bytesRequest);
+
+            MimeTypesModel mimeTypes = new MimeTypesModel();
+
+            FileInfo fileInfo = new FileInfo(GetFilesPhysicalPath(request.ResourceRequested));
+
+            if (fileInfo.Exists)
             {
-                Console.WriteLine($"\n{textRequest}\n");
-
-                HandledRequest request = HandleRequest(textRequest);        
-                        
-                byte[] bytesContext = ReadFile(request.ResourceRequested);
-                byte[] bytesHeader = null;    
-                int bytesSending = 0;
-
-                if (bytesContext.Length > 0)
+                if (mimeTypes.Types.ContainsKey(fileInfo.Extension.ToLower()))
                 {
-                    bytesHeader = GenerateHeader(request.VersionHttp, "text/html;charset=utf-8", "200", bytesContext.Length);
-                    bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
+                    string mimeType = mimeTypes.Types[fileInfo.Extension.ToLower()] + ";charset=utf-8";
+
+                    bytesContext = File.ReadAllBytes(fileInfo.FullName);
+                    bytesHeader = GenerateHeader(request.VersionHttp, mimeType, "200", bytesContext.Length);
                 }
                 else
                 {
-                    bytesContext = Encoding.UTF8.GetBytes("<h1>Erro 404 - Pahe not found</h1>");
-                    bytesHeader = GenerateHeader(request.VersionHttp, "text/html;charset=utf-8", "404", bytesContext.Length);
-                    bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
+                    string mimeType = mimeTypes.Types[".html"] + ";charset=utf-8";
+                    
+                    bytesContext = Encoding.UTF8.GetBytes("<h1>Erro 415 - Type file not suported</h1>");
+                    bytesHeader = GenerateHeader(request.VersionHttp, mimeType, "415", bytesContext.Length);
                 }
-                
-                bytesSending += socket.Send(bytesContext, bytesContext.Length, 0);
-
-                socket.Close();
             }
+            else
+            {
+                string mimeType = mimeTypes.Types[".html"] + ";charset=utf-8";
+
+                bytesContext = Encoding.UTF8.GetBytes("<h1>Erro 404 - Page not found</h1>");
+                bytesHeader = GenerateHeader(request.VersionHttp, mimeType, "404", bytesContext.Length);
+            }
+
+            bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
+
+            bytesSending += socket.Send(bytesContext, bytesContext.Length, 0);
+
+            socket.Close();
             
-            Console.WriteLine($"\nRequest {requestNumber} Ended.");
+            Console.WriteLine($"Request {requestNumber} Ended.\nBytes Sending: {bytesSending}");
         }
     }
 
@@ -97,47 +111,11 @@ class ServidorHttp : IServerHttp
         return Encoding.UTF8.GetBytes(header.ToString());
     }
 
-    private void GenerateHtml()
+    private string GetFilesPhysicalPath(string file)
     {
-        StringBuilder html = new StringBuilder();
+        string directory = "C:\\Users\\rafae\\Documents\\Github\\DotNetProjects\\ServidorHttpSimples\\www\\html\\";
+        string filePath = directory + file.Replace("/", "\\");
 
-        html.Append("<!DOCTYPE html><html lang=\"pt-br\"><head><meta charset=\"UTF-8\">");
-        html.Append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-        html.Append("<title>Static Page</title></head><body>");
-        html.Append("<h1>Index</h1></body><html>");
-
-        this.Html = html.ToString();
+        return filePath;
     }
-
-    private byte[] ReadFile(string resource)
-    {
-        string directory = "C:\\Users\\rafae\\Documents\\Github\\DotNetProjects\\ServidorHttpSimples\\www\\";
-        string filePath = directory + resource.Replace("/", "\\");
-
-        if (File.Exists(filePath))
-            return File.ReadAllBytes(filePath);
-
-        return new byte[0];
-    }
-
-    private HandledRequest HandleRequest(string textRequest)
-    {
-        HandledRequest handleRequest = new HandledRequest();
-        
-        string[] linesTextRequest = textRequest.Split("\r\n");
-        int iFirstSpace = linesTextRequest[0].IndexOf(' ');
-        int iSecondSpace = linesTextRequest[0].LastIndexOf(' ');
-
-        handleRequest.MethodHttp = linesTextRequest[0].Substring(0, iFirstSpace);
-        handleRequest.ResourceRequested = linesTextRequest[0].Substring(
-            iFirstSpace + 1, iSecondSpace - iFirstSpace - 1);
-        handleRequest.VersionHttp = linesTextRequest[0].Substring(iSecondSpace + 1);
-
-        iFirstSpace = linesTextRequest[1].IndexOf(' ');
-
-        handleRequest.HostName = linesTextRequest[1].Substring(iFirstSpace + 1);
-
-        return handleRequest;
-    }
-
 }

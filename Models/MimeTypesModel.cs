@@ -6,17 +6,27 @@ class MimeTypesModel
 
     public MimeTypesModel()
     {
-        this.Types.Add(".html", "text/html");
-        this.Types.Add(".htm", "text/html");
-        this.Types.Add(".css", "text/css");
-        this.Types.Add(".js", "application/javascript");
-        this.Types.Add(".png", "image/png");
-        this.Types.Add(".jpg", "image/jpeg");
-        this.Types.Add(".gif", "image/gif");
-        this.Types.Add(".svg", "image/svg+xml");
-        this.Types.Add(".webp", "image/webp");
-        this.Types.Add(".ico", "image/x-icon");
-        this.Types.Add(".woff", "font/woff");
-        this.Types.Add(".woff2", "font/woff2");
+        this.Types = GenerateListMimeTyper();
+    }
+
+    private SortedList<string, string> GenerateListMimeTyper()
+    {
+        
+        SortedList<string, string> types = new SortedList<string, string>();
+        
+        types.Add(".html", "text/html");
+        types.Add(".htm", "text/html");
+        types.Add(".css", "text/css");
+        types.Add(".js", "application/javascript");
+        types.Add(".png", "image/png");
+        types.Add(".jpg", "image/jpeg");
+        types.Add(".gif", "image/gif");
+        types.Add(".svg", "image/svg+xml");
+        types.Add(".webp", "image/webp");
+        types.Add(".ico", "image/x-icon");
+        types.Add(".woff", "font/woff");
+        types.Add(".woff2", "font/woff2");
+
+        return types;
     }
 }
