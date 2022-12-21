@@ -58,19 +58,31 @@ class ServidorHttp : IServerHttp
             {
                 Console.WriteLine($"\n{textRequest}\n");
 
-                byte[] bytesContext = ReadFile("/index.html");
-                byte[] bytesHeader = GenerateHeader("HTTP/1.1", "text/html;charset=utf-8", "200", bytesContext.Length);
+                HandledRequest request = HandleRequest(textRequest);        
+                        
+                byte[] bytesContext = ReadFile(request.ResourceRequested);
+                byte[] bytesHeader = null;    
+                int bytesSending = 0;
 
-                int bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
+                if (bytesContext.Length > 0)
+                {
+                    bytesHeader = GenerateHeader(request.VersionHttp, "text/html;charset=utf-8", "200", bytesContext.Length);
+                    bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
+                }
+                else
+                {
+                    bytesContext = Encoding.UTF8.GetBytes("<h1>Erro 404 - Pahe not found</h1>");
+                    bytesHeader = GenerateHeader(request.VersionHttp, "text/html;charset=utf-8", "404", bytesContext.Length);
+                    bytesSending = socket.Send(bytesHeader, bytesHeader.Length, 0);
+                }
+                
                 bytesSending += socket.Send(bytesContext, bytesContext.Length, 0);
 
                 socket.Close();
             }
-
+            
             Console.WriteLine($"\nRequest {requestNumber} Ended.");
-
         }
-
     }
 
     private byte[] GenerateHeader(string httpVersion, string mimeType, string httpCode, int qtdBytes = 0)
@@ -99,12 +111,33 @@ class ServidorHttp : IServerHttp
 
     private byte[] ReadFile(string resource)
     {
-        string directory = "C:\\Users\rafae\\Documents\\Github\\DotNetProjects\\ServidorHttpSimples\\www";
+        string directory = "C:\\Users\\rafae\\Documents\\Github\\DotNetProjects\\ServidorHttpSimples\\www\\";
         string filePath = directory + resource.Replace("/", "\\");
 
         if (File.Exists(filePath))
             return File.ReadAllBytes(filePath);
-        
+
         return new byte[0];
     }
+
+    private HandledRequest HandleRequest(string textRequest)
+    {
+        HandledRequest handleRequest = new HandledRequest();
+        
+        string[] linesTextRequest = textRequest.Split("\r\n");
+        int iFirstSpace = linesTextRequest[0].IndexOf(' ');
+        int iSecondSpace = linesTextRequest[0].LastIndexOf(' ');
+
+        handleRequest.MethodHttp = linesTextRequest[0].Substring(0, iFirstSpace);
+        handleRequest.ResourceRequested = linesTextRequest[0].Substring(
+            iFirstSpace + 1, iSecondSpace - iFirstSpace - 1);
+        handleRequest.VersionHttp = linesTextRequest[0].Substring(iSecondSpace + 1);
+
+        iFirstSpace = linesTextRequest[1].IndexOf(' ');
+
+        handleRequest.HostName = linesTextRequest[1].Substring(iFirstSpace + 1);
+
+        return handleRequest;
+    }
+
 }
