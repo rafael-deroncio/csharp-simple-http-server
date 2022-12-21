@@ -56,13 +56,13 @@ class ServidorHttp : IServerHttp
             
             socket.Receive(bytesRequest, bytesRequest.Length, 0);
 
-            Console.WriteLine($"{Encoding.UTF8.GetString(bytesRequest)}\n");
-
             HandledRequest request = new HandledRequest(bytesRequest);
 
             MimeTypesModel mimeTypes = new MimeTypesModel();
 
             FileInfo fileInfo = new FileInfo(GetFilesPhysicalPath(request.ResourceRequested));
+
+            Console.WriteLine($"{request.RawText}\n");
 
             if (fileInfo.Exists)
             {
